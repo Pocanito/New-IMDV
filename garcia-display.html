@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>García Diseños Publicitarios</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+    }
+
+    #header {
+      width: 100%;
+      height: 20vh;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      border-bottom: 1px solid #111;
+    }
+
+    #logo-track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      height: 85%;
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    .logo-item {
+      height: 100%;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(255, 180, 0, 0.28));
+    }
+
+    #gear-btn {
+      position: absolute;
+      right: 12px;
+      bottom: 8px;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      z-index: 20;
+      opacity: 0.78;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    #gear-btn:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    #gear-btn svg {
+      width: 100%;
+      height: 100%;
+      animation: gearSpin 6s linear infinite;
+    }
+
+    @keyframes gearSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    #video-zone {
+      width: 100%;
+      height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #000;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    #main-video {
+      width: auto;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+
+    #video-status {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      padding: 10px 14px;
+      border: 1px solid #2c2c2c;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.58);
+      color: #8f8f8f;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    #ticker-zone {
+      width: 100%;
+      height: 10vh;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      border-top: 1px solid #111;
+    }
+
+    #ticker-track {
+      position: absolute;
+      left: 0;
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      white-space: nowrap;
+      font-size: clamp(1rem, 2.4vh, 1.5rem);
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      will-change: transform;
+    }
+
+    .ticker-msg {
+      animation: neonCycle 3s linear infinite;
+      text-shadow:
+        0 0 6px currentColor,
+        0 0 16px currentColor,
+        0 0 32px currentColor;
+    }
+
+    .ticker-sep { color: #444; }
+
+    @keyframes neonCycle {
+      0% { color: #ff0044; }
+      20% { color: #ff9900; }
+      40% { color: #00ff88; }
+      60% { color: #00cfff; }
+      80% { color: #cc00ff; }
+      100% { color: #ff0044; }
+    }
+
+    #menu-overlay,
+    .panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.93);
+      padding: 30px;
+    }
+
+    #menu-overlay.active,
+    .panel.active {
+      display: flex;
+    }
+
+    #menu-box {
+      width: min(460px, 92vw);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 36px;
+      background: #111;
+      border: 1px solid #282828;
+      border-radius: 18px;
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+    }
+
+    #menu-title {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #555;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .menu-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 26px 16px;
+      background: #181818;
+      border: 2px solid #2e2e2e;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      user-select: none;
+      transition: background .18s ease, border-color .18s ease, transform .12s ease;
+      text-transform: uppercase;
+    }
+
+    .menu-btn:hover {
+      background: #232323;
+      border-color: #555;
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      font-size: 1.7rem;
+      line-height: 1;
+    }
+
+    .menu-btn.run {
+      grid-column: 1 / -1;
+      padding: 30px;
+      border-color: transparent;
+      background: linear-gradient(135deg, #e8a000, #ff4f00);
+      font-size: 1.15rem;
+      letter-spacing: 0.22em;
+    }
+
+    .menu-btn.run:hover {
+      filter: brightness(1.12);
+      border-color: transparent;
+    }
+
+    .panel-inner {
+      width: min(760px, 95vw);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      padding: 28px;
+      background: rgba(10, 10, 10, 0.96);
+      border: 1px solid #202020;
+      border-radius: 18px;
+    }
+
+    .panel h2 {
+      color: #777;
+      font-size: 0.95rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .panel-close {
+      margin-top: 4px;
+      padding: 11px 34px;
+      background: transparent;
+      border: 2px solid #333;
+      border-radius: 10px;
+      color: #666;
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color .18s ease, color .18s ease;
+    }
+
+    .panel-close:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    #video-gallery {
+      width: 100%;
+      max-width: 680px;
+      max-height: 54vh;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      padding-right: 4px;
+    }
+
+    .vid-card {
+      width: 160px;
+      background: #181818;
+      border: 2px solid #2e2e2e;
+      border-radius: 12px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      color: #bbb;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: border-color .18s ease, transform .12s ease, color .18s ease;
+    }
+
+    .vid-card:hover {
+      border-color: #e8a000;
+      transform: translateY(-2px);
+    }
+
+    .vid-card.active-vid {
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+
+    .vid-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    #logo-drop-area {
+      width: 270px;
+      height: 150px;
+      border: 2px dashed #3a3a3a;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #555;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color .2s ease, color .2s ease;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    #logo-drop-area:hover {
+      border-color: #e8a000;
+      color: #e8a000;
+    }
+
+    .drop-icon {
+      font-size: 2.2rem;
+    }
+
+    #logo-preview {
+      max-height: 90px;
+      max-width: 260px;
+      object-fit: contain;
+      display: none;
+      border-radius: 8px;
+    }
+
+    .panel-note {
+      color: #444;
+      font-size: 0.73rem;
+      text-align: center;
+      max-width: 360px;
+      line-height: 1.6;
+      letter-spacing: 0.05em;
+    }
+
+    #texto-input-wrap {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      gap: 10px;
+    }
+
+    #texto-input {
+      flex: 1;
+      background: #181818;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 11px 15px;
+      color: #fff;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      outline: none;
+      text-transform: uppercase;
+      transition: border-color .18s ease;
+    }
+
+    #texto-input:focus {
+      border-color: #00cfff;
+    }
+
+    #texto-input::placeholder {
+      color: #3a3a3a;
+      text-transform: none;
+      font-size: 0.85rem;
+    }
+
+    #texto-add-btn {
+      padding: 11px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00cfff, #0055ee);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: filter .18s ease;
+    }
+
+    #texto-add-btn:hover {
+      filter: brightness(1.15);
+    }
+
+    #texto-list {
+      width: 100%;
+      max-width: 480px;
+      max-height: 190px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .texto-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #181818;
+      border: 1px solid #272727;
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: #ccc;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .texto-item span {
+      flex: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      color: #444;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+      transition: color .15s ease;
+    }
+
+    .del-btn:hover {
+      color: #ff4444;
+    }
+
+    @media (max-width: 768px) {
+      #header { height: 18vh; }
+      #video-zone { height: 72vh; }
+      #ticker-zone { height: 10vh; }
+      #menu-box { grid-template-columns: 1fr; }
+      .menu-btn.run { grid-column: auto; }
+      .panel-inner { padding: 22px 18px; }
+      .vid-card { width: calc(50% - 10px); min-width: 140px; }
+      #video-status { font-size: 0.68rem; left: 10px; right: 10px; bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <div id="logo-track">
+        <img class="logo-item" id="logo-garcia" src="IMG_000.PNG" alt="García Diseños" />
+      </div>
+
+      <div id="gear-btn" title="Configuración" onclick="openMenu()" aria-label="Abrir configuración">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div id="video-zone">
+      <video id="main-video" src="Screen000.mp4" autoplay loop muted playsinline preload="auto"></video>
+      <div id="video-status">Video principal activo</div>
+    </div>
+
+    <div id="ticker-zone">
+      <div id="ticker-track"></div>
+    </div>
+  </div>
+
+  <div id="menu-overlay" onclick="handleOverlayClick(event)">
+    <div id="menu-box">
+      <div id="menu-title">Panel de control</div>
+      <div class="menu-btn" onclick="openPanel('video')">
+        <span class="btn-icon">🎬</span>
+        <span>Video</span>
+      </div>
+      <div class="menu-btn" onclick="openPanel('logo')">
+        <span class="btn-icon">🖼</span>
+        <span>Logo</span>
+      </div>
+      <div class="menu-btn" onclick="openPanel('texto')">
+        <span class="btn-icon">✏️</span>
+        <span>Texto</span>
+      </div>
+      <div class="menu-btn run" onclick="runProject()">
+        <span class="btn-icon">▶</span>
+        <span>Run Project</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-video" class="panel">
+    <div class="panel-inner">
+      <h2>🎬 &nbsp; Seleccionar video</h2>
+      <div id="video-gallery"></div>
+      <p class="panel-note">Esta versión ya no usa videos.json. Agrega tus rutas directamente en el arreglo <strong style="color:#666">VIDEO_SOURCES</strong>.</p>
+      <button class="panel-close" onclick="closePanel('video')">← Volver</button>
+    </div>
+  </div>
+
+  <div id="panel-logo" class="panel">
+    <div class="panel-inner">
+      <h2>🖼 &nbsp; Agregar segundo logo</h2>
+      <div id="logo-drop-area" onclick="document.getElementById('logo-file-input').click()">
+        <span class="drop-icon">📂</span>
+        <span>Seleccionar logo</span>
+        <span style="font-size:0.72rem;color:#444;">PNG · JPG · SVG · WEBP</span>
+      </div>
+      <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoUpload(event)" />
+      <img id="logo-preview" alt="Preview del logo" />
+      <p class="panel-note">García Diseños siempre va primero. Tu logo se agrega detrás del principal y solo dura durante esta sesión.</p>
+      <button class="panel-close" onclick="closePanel('logo')">← Volver</button>
+    </div>
+  </div>
+
+  <div id="panel-texto" class="panel">
+    <div class="panel-inner">
+      <h2>✏️ &nbsp; Mensajes del ticker</h2>
+      <div id="texto-input-wrap">
+        <input type="text" id="texto-input" placeholder="Escribe tu mensaje..." maxlength="120" onkeydown="if(event.key==='Enter') addTextoMsg()" />
+        <button id="texto-add-btn" onclick="addTextoMsg()">+</button>
+      </div>
+      <div id="texto-list"></div>
+      <p class="panel-note">Los mensajes corren en ciclo y se eliminan al cerrar la página.</p>
+      <button class="panel-close" onclick="closePanel('texto')">← Volver</button>
+    </div>
+  </div>
+
+  <script>
+    const VIDEO_SOURCES = [
+      { name: 'Video principal', file: 'Screen000.mp4', principal: true },
+      { name: 'Promo 1', file: 'videos/video001.mp4' },
+      { name: 'Promo 2', file: 'videos/video002.mp4' },
+      { name: 'Promo 2', file: 'videos/video003.mp4' },
+      { name: 'Promo 3', file: 'videos/video004.mp4' }
+    ];
+
+    const logoTrack = document.getElementById('logo-track');
+    const logoGarcia = document.getElementById('logo-garcia');
+    const mainVideo = document.getElementById('main-video');
+    const videoStatus = document.getElementById('video-status');
+    const tickerTrack = document.getElementById('ticker-track');
+
+    let logoX = 0;
+    let logoRAF = null;
+    let currentIndex = 0;
+    let userLogoURL = null;
+    let tickerMessages = [];
+    let tickerX = 0;
+    let tickerRAF = null;
+
+    const LOGO_SPEED = 1.8;
+    const TICKER_SPEED = 1.4;
+
+    function initLogoTrack() {
+      cancelAnimationFrame(logoRAF);
+      logoX = -(logoTrack.offsetWidth + 80);
+      moveLogos();
+    }
+
+    function moveLogos() {
+      logoX += LOGO_SPEED;
+      if (logoX > window.innerWidth + 80) {
+        logoX = -(logoTrack.offsetWidth + 80);
+      }
+      logoTrack.style.left = logoX + 'px';
+      logoRAF = requestAnimationFrame(moveLogos);
+    }
+
+    logoGarcia.addEventListener('load', initLogoTrack);
+    if (logoGarcia.complete) initLogoTrack();
+    window.addEventListener('resize', initLogoTrack);
+
+    function setVideoStatus(text) {
+      videoStatus.textContent = text;
+    }
+
+    function activarVideo(indice, card = null) {
+      const video = VIDEO_SOURCES[indice];
+      if (!video) return;
+
+      currentIndex = indice;
+      mainVideo.src = video.file;
+      mainVideo.load();
+      mainVideo.play().catch(() => {});
+      setVideoStatus(`Activo: ${video.name}`);
+
+      document.querySelectorAll('.vid-card').forEach(c => c.classList.remove('active-vid'));
+      if (card) card.classList.add('active-vid');
+    }
+
+    function loadVideoGallery() {
+      const gallery = document.getElementById('video-gallery');
+      gallery.innerHTML = '';
+
+      VIDEO_SOURCES.forEach((video, i) => {
+        const card = document.createElement('div');
+        card.className = 'vid-card' + (i === currentIndex ? ' active-vid' : '');
+        card.innerHTML = `<div class="vid-icon">🎬</div><div>${video.name}</div>`;
+        card.onclick = () => activarVideo(i, card);
+        gallery.appendChild(card);
+      });
+    }
+
+    mainVideo.addEventListener('pause', () => {
+      try { mainVideo.play(); } catch (e) {}
+    });
+
+    mainVideo.addEventListener('error', () => {
+      setVideoStatus('Error al cargar el video actual');
+    });
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (userLogoURL) URL.revokeObjectURL(userLogoURL);
+      userLogoURL = URL.createObjectURL(file);
+
+      const prev = document.getElementById('logo-preview');
+      prev.src = userLogoURL;
+      prev.style.display = 'block';
+
+      const old = document.getElementById('logo-user');
+      if (old) old.remove();
+
+      const img = document.createElement('img');
+      img.className = 'logo-item';
+      img.id = 'logo-user';
+      img.src = userLogoURL;
+      img.alt = 'Logo del usuario';
+      logoTrack.appendChild(img);
+      img.onload = initLogoTrack;
+    }
+
+    function buildTickerDOM() {
+      cancelAnimationFrame(tickerRAF);
+      tickerTrack.innerHTML = '';
+      if (tickerMessages.length === 0) return;
+
+      const doubled = [...tickerMessages, ...tickerMessages];
+      doubled.forEach((msg, i) => {
+        const span = document.createElement('span');
+        span.className = 'ticker-msg';
+        span.textContent = msg.toUpperCase();
+        span.style.animationDelay = `${-(i * 0.5)}s`;
+        tickerTrack.appendChild(span);
+
+        if (i < doubled.length - 1) {
+          const sep = document.createElement('span');
+          sep.className = 'ticker-sep';
+          sep.textContent = ' ◆ ';
+          tickerTrack.appendChild(sep);
+        }
+      });
+
+      tickerX = window.innerWidth + 40;
+      moveTicker();
+    }
+
+    function moveTicker() {
+      tickerX -= TICKER_SPEED;
+      const half = tickerTrack.offsetWidth / 2;
+      if (tickerX < -(half + 60)) {
+        tickerX = window.innerWidth + 40;
+      }
+      tickerTrack.style.left = tickerX + 'px';
+      tickerRAF = requestAnimationFrame(moveTicker);
+    }
+
+    function addTextoMsg() {
+      const input = document.getElementById('texto-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      tickerMessages.push(val);
+      input.value = '';
+      renderTextoList();
+      buildTickerDOM();
+    }
+
+    function removeTextoMsg(idx) {
+      tickerMessages.splice(idx, 1);
+      renderTextoList();
+      buildTickerDOM();
+    }
+
+    function renderTextoList() {
+      const list = document.getElementById('texto-list');
+      list.innerHTML = '';
+
+      tickerMessages.forEach((msg, i) => {
+        const div = document.createElement('div');
+        div.className = 'texto-item';
+        div.innerHTML = `<span>${msg.toUpperCase()}</span><button class="del-btn" onclick="removeTextoMsg(${i})">✕</button>`;
+        list.appendChild(div);
+      });
+    }
+
+    function openMenu() {
+      document.getElementById('menu-overlay').classList.add('active');
+    }
+
+    function closeMenu() {
+      document.getElementById('menu-overlay').classList.remove('active');
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('menu-overlay')) closeMenu();
+    }
+
+    function openPanel(tipo) {
+      closeMenu();
+      if (tipo === 'video') loadVideoGallery();
+      document.getElementById('panel-' + tipo).classList.add('active');
+    }
+
+    function closePanel(tipo) {
+      document.getElementById('panel-' + tipo).classList.remove('active');
+    }
+
+    function runProject() {
+      closeMenu();
+      mainVideo.play().catch(() => {});
+    }
+
+    setVideoStatus(`Activo: ${VIDEO_SOURCES[0].name}`);
+  </script>
+</body>
+</html>
