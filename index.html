@@ -41,7 +41,7 @@
       height: 85%;
       display: flex;
       align-items: center;
-      gap: 80px;
+      justify-content: center;
       white-space: nowrap;
       will-change: transform;
     }
@@ -546,7 +546,7 @@
       </div>
       <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoUpload(event)" />
       <img id="logo-preview" alt="Preview del logo" />
-      <p class="panel-note">García Diseños siempre va primero. Tu logo se agrega detrás del principal y solo dura durante esta sesión.</p>
+      <p class="panel-note">El ciclo de logos ahora es secuencial: primero usuario, luego García, en loop infinito.</p>
       <button class="panel-close" onclick="closePanel('logo')">← Volver</button>
     </div>
   </div>
@@ -565,120 +565,105 @@
   </div>
 
   <script>
-   const VIDEO_SOURCES = [
-  { name: 'Video principal', file: 'Screen000.mp4', principal: true },
-  { name: 'Promo 1', file: 'video001.mp4' },
-  { name: 'Promo 2', file: 'video002.mp4' },
-  { name: 'Promo 3', file: 'video003.mp4' },
-  { name: 'Promo 4', file: 'video004.mp4' }
-                        ];
-const logoTrack = document.getElementById('logo-track');
-const logoGarcia = document.getElementById('logo-garcia');
+    const VIDEO_SOURCES = [
+      { name: 'Video principal', file: 'Screen000.mp4', principal: true },
+      { name: 'Promo 1', file: 'video001.mp4' },
+      { name: 'Promo 2', file: 'video002.mp4' },
+      { name: 'Promo 3', file: 'video003.mp4' },
+      { name: 'Promo 4', file: 'video004.mp4' }
+    ];
 
-let logoRAF = null;
-let logoX = 0;
-let userLogoURL = null;
-let activeLogoIndex = 0;
+    const logoTrack = document.getElementById('logo-track');
+    const logoGarcia = document.getElementById('logo-garcia');
+    const mainVideo = document.getElementById('main-video');
+    const videoStatus = document.getElementById('video-status');
+    const tickerTrack = document.getElementById('ticker-track');
 
-const LOGO_SPEED = 1.8;
+    let logoRAF = null;
+    let logoX = 0;
+    let userLogoURL = null;
+    let activeLogoIndex = 0;
+    let currentIndex = 0;
+    let tickerMessages = [];
+    let tickerX = 0;
+    let tickerRAF = null;
 
-const logoSequence = [
-  {
-    id: 'logo-user',
-    alt: 'Logo usuario',
-    src: null
-  },
-  {
-    id: 'logo-garcia',
-    alt: 'García Diseños',
-    src: logoGarcia.getAttribute('src')
-  }
-];
+    const LOGO_SPEED = 1.8;
+    const TICKER_SPEED = 1.4;
 
-function getAvailableLogos() {
-  return logoSequence.filter(logo => !!logo.src);
-}
+    const logoSequence = [
+      { id: 'logo-user', alt: 'Logo usuario', src: null },
+      { id: 'logo-garcia', alt: 'García Diseños', src: logoGarcia.getAttribute('src') }
+    ];
 
-function renderActiveLogo() {
-  const logos = getAvailableLogos();
-  if (logos.length === 0) return;
-
-  if (activeLogoIndex >= logos.length) {
-    activeLogoIndex = 0;
-  }
-
-  const currentLogo = logos[activeLogoIndex];
-
-  logoTrack.innerHTML = `
-    <img
-      class="logo-item"
-      id="${currentLogo.id}"
-      src="${currentLogo.src}"
-      alt="${currentLogo.alt}"
-    />
-  `;
-
-  const img = logoTrack.querySelector('.logo-item');
-  img.onload = startLogoCycle;
-  if (img.complete) startLogoCycle();
-}
-
-function startLogoCycle() {
-  cancelAnimationFrame(logoRAF);
-  logoX = -(logoTrack.offsetWidth + 80);
-  animateSingleLogo();
-}
-
-function animateSingleLogo() {
-  logoX += LOGO_SPEED;
-
-  if (logoX > window.innerWidth + 80) {
-    const logos = getAvailableLogos();
-    activeLogoIndex = (activeLogoIndex + 1) % logos.length;
-    renderActiveLogo();
-    return;
-  }
-
-  logoTrack.style.left = logoX + 'px';
-  logoRAF = requestAnimationFrame(animateSingleLogo);
-}
-
-function handleLogoUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  if (userLogoURL) {
-    URL.revokeObjectURL(userLogoURL);
-  }
-
-  userLogoURL = URL.createObjectURL(file);
-
-  const prev = document.getElementById('logo-preview');
-  prev.src = userLogoURL;
-  prev.style.display = 'block';
-
-  logoSequence[0].src = userLogoURL;
-  activeLogoIndex = 0;
-  renderActiveLogo();
-}
-
-window.addEventListener('resize', renderActiveLogo);
-renderActiveLogo();
-
+    function getAvailableLogos() {
+      return logoSequence.filter(logo => !!logo.src);
     }
 
-    function moveLogos() {
-      logoX += LOGO_SPEED;
-      if (logoX > window.innerWidth + 80) {
-        logoX = -(logoTrack.offsetWidth + 80);
+    function renderActiveLogo() {
+      const logos = getAvailableLogos();
+      if (logos.length === 0) return;
+
+      if (activeLogoIndex >= logos.length) {
+        activeLogoIndex = 0;
       }
-      logoTrack.style.left = logoX + 'px';
-      logoRAF = requestAnimationFrame(moveLogos);
+
+      const currentLogo = logos[activeLogoIndex];
+
+      logoTrack.innerHTML = `
+        <img
+          class="logo-item"
+          id="${currentLogo.id}"
+          src="${currentLogo.src}"
+          alt="${currentLogo.alt}"
+        />
+      `;
+
+      const img = logoTrack.querySelector('.logo-item');
+      if (!img) return;
+
+      img.onload = startLogoCycle;
+      if (img.complete) startLogoCycle();
     }
 
-    logoGarcia.addEventListener('load', initLogoTrack);
-    if (logoGarcia.complete) initLogoTrack();
-    window.addEventListener('resize', initLogoTrack);
+    function startLogoCycle() {
+      cancelAnimationFrame(logoRAF);
+      logoX = -(logoTrack.offsetWidth + 80);
+      animateSingleLogo();
+    }
+
+    function animateSingleLogo() {
+      logoX += LOGO_SPEED;
+
+      if (logoX > window.innerWidth + 80) {
+        const logos = getAvailableLogos();
+        activeLogoIndex = (activeLogoIndex + 1) % logos.length;
+        renderActiveLogo();
+        return;
+      }
+
+      logoTrack.style.left = logoX + 'px';
+      logoRAF = requestAnimationFrame(animateSingleLogo);
+    }
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (userLogoURL) {
+        URL.revokeObjectURL(userLogoURL);
+      }
+
+      userLogoURL = URL.createObjectURL(file);
+
+      const prev = document.getElementById('logo-preview');
+      prev.src = userLogoURL;
+      prev.style.display = 'block';
+
+      logoSequence[0].src = userLogoURL;
+      activeLogoIndex = 0;
+      renderActiveLogo();
+    }
 
     function setVideoStatus(text) {
       videoStatus.textContent = text;
@@ -719,29 +704,6 @@ renderActiveLogo();
       setVideoStatus('Error al cargar el video actual');
     });
 
-    function handleLogoUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      if (userLogoURL) URL.revokeObjectURL(userLogoURL);
-      userLogoURL = URL.createObjectURL(file);
-
-      const prev = document.getElementById('logo-preview');
-      prev.src = userLogoURL;
-      prev.style.display = 'block';
-
-      const old = document.getElementById('logo-user');
-      if (old) old.remove();
-
-      const img = document.createElement('img');
-      img.className = 'logo-item';
-      img.id = 'logo-user';
-      img.src = userLogoURL;
-      img.alt = 'Logo del usuario';
-      logoTrack.appendChild(img);
-      img.onload = initLogoTrack;
-    }
-
     function buildTickerDOM() {
       cancelAnimationFrame(tickerRAF);
       tickerTrack.innerHTML = '';
@@ -770,9 +732,11 @@ renderActiveLogo();
     function moveTicker() {
       tickerX -= TICKER_SPEED;
       const half = tickerTrack.offsetWidth / 2;
+
       if (tickerX < -(half + 60)) {
         tickerX = window.innerWidth + 40;
       }
+
       tickerTrack.style.left = tickerX + 'px';
       tickerRAF = requestAnimationFrame(moveTicker);
     }
@@ -833,6 +797,11 @@ renderActiveLogo();
       mainVideo.play().catch(() => {});
     }
 
+    window.addEventListener('resize', () => {
+      renderActiveLogo();
+    });
+
+    renderActiveLogo();
     setVideoStatus(`Activo: ${VIDEO_SOURCES[0].name}`);
   </script>
 </body>
