@@ -572,28 +572,99 @@
   { name: 'Promo 3', file: 'video003.mp4' },
   { name: 'Promo 4', file: 'video004.mp4' }
                         ];
+const logoTrack = document.getElementById('logo-track');
+const logoGarcia = document.getElementById('logo-garcia');
 
-    const logoTrack = document.getElementById('logo-track');
-    const logoGarcia = document.getElementById('logo-garcia');
-    const mainVideo = document.getElementById('main-video');
-    const videoStatus = document.getElementById('video-status');
-    const tickerTrack = document.getElementById('ticker-track');
+let logoRAF = null;
+let logoX = 0;
+let userLogoURL = null;
+let activeLogoIndex = 0;
 
-    let logoX = 0;
-    let logoRAF = null;
-    let currentIndex = 0;
-    let userLogoURL = null;
-    let tickerMessages = [];
-    let tickerX = 0;
-    let tickerRAF = null;
+const LOGO_SPEED = 1.8;
 
-    const LOGO_SPEED = 1.8;
-    const TICKER_SPEED = 1.4;
+const logoSequence = [
+  {
+    id: 'logo-user',
+    alt: 'Logo usuario',
+    src: null
+  },
+  {
+    id: 'logo-garcia',
+    alt: 'García Diseños',
+    src: logoGarcia.getAttribute('src')
+  }
+];
 
-    function initLogoTrack() {
-      cancelAnimationFrame(logoRAF);
-      logoX = -(logoTrack.offsetWidth + 80);
-      moveLogos();
+function getAvailableLogos() {
+  return logoSequence.filter(logo => !!logo.src);
+}
+
+function renderActiveLogo() {
+  const logos = getAvailableLogos();
+  if (logos.length === 0) return;
+
+  if (activeLogoIndex >= logos.length) {
+    activeLogoIndex = 0;
+  }
+
+  const currentLogo = logos[activeLogoIndex];
+
+  logoTrack.innerHTML = `
+    <img
+      class="logo-item"
+      id="${currentLogo.id}"
+      src="${currentLogo.src}"
+      alt="${currentLogo.alt}"
+    />
+  `;
+
+  const img = logoTrack.querySelector('.logo-item');
+  img.onload = startLogoCycle;
+  if (img.complete) startLogoCycle();
+}
+
+function startLogoCycle() {
+  cancelAnimationFrame(logoRAF);
+  logoX = -(logoTrack.offsetWidth + 80);
+  animateSingleLogo();
+}
+
+function animateSingleLogo() {
+  logoX += LOGO_SPEED;
+
+  if (logoX > window.innerWidth + 80) {
+    const logos = getAvailableLogos();
+    activeLogoIndex = (activeLogoIndex + 1) % logos.length;
+    renderActiveLogo();
+    return;
+  }
+
+  logoTrack.style.left = logoX + 'px';
+  logoRAF = requestAnimationFrame(animateSingleLogo);
+}
+
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (userLogoURL) {
+    URL.revokeObjectURL(userLogoURL);
+  }
+
+  userLogoURL = URL.createObjectURL(file);
+
+  const prev = document.getElementById('logo-preview');
+  prev.src = userLogoURL;
+  prev.style.display = 'block';
+
+  logoSequence[0].src = userLogoURL;
+  activeLogoIndex = 0;
+  renderActiveLogo();
+}
+
+window.addEventListener('resize', renderActiveLogo);
+renderActiveLogo();
+
     }
 
     function moveLogos() {
