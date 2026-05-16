@@ -50,9 +50,9 @@
       object-fit: contain;
       filter: drop-shadow(0 0 10px rgba(255, 180, 0, 0.28));
     }
-    #gear-btn {
+    #gear-btn,
+    #cast-btn {
       position: absolute;
-      right: 12px;
       bottom: 8px;
       width: 38px;
       height: 38px;
@@ -60,15 +60,35 @@
       z-index: 20;
       opacity: 0.78;
       transition: opacity .2s ease, transform .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    #gear-btn:hover {
+    #gear-btn {
+      right: 12px;
+    }
+    #cast-btn {
+      right: 58px;
+      border: 1px solid #2d2d2d;
+      border-radius: 10px;
+      background: rgba(20, 20, 20, 0.88);
+    }
+    #gear-btn:hover,
+    #cast-btn:hover {
       opacity: 1;
       transform: scale(1.05);
     }
+    #gear-btn svg,
+    #cast-btn svg {
+      width: 22px;
+      height: 22px;
+    }
     #gear-btn svg {
-      width: 100%;
-      height: 100%;
       animation: gearSpin 6s linear infinite;
+    }
+    #cast-btn.active {
+      border-color: #00cfff;
+      box-shadow: 0 0 14px rgba(0, 207, 255, 0.22);
     }
     @keyframes gearSpin {
       from { transform: rotate(0deg); }
@@ -333,7 +353,7 @@
       color: #444;
       font-size: 0.73rem;
       text-align: center;
-      max-width: 360px;
+      max-width: 420px;
       line-height: 1.6;
       letter-spacing: 0.05em;
     }
@@ -417,6 +437,53 @@
     .del-btn:hover {
       color: #ff4444;
     }
+    .tv-guide {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tv-guide-item {
+      width: 100%;
+      background: #181818;
+      border: 1px solid #272727;
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #cfcfcf;
+      line-height: 1.6;
+    }
+    .tv-guide-item strong {
+      color: #00cfff;
+      display: block;
+      margin-bottom: 4px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+    }
+    .tv-action-btn {
+      padding: 12px 18px;
+      border: 1px solid #2f2f2f;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00cfff, #0068ff);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: filter .18s ease, transform .12s ease;
+    }
+    .tv-action-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .tv-status {
+      color: #666;
+      font-size: 0.78rem;
+      text-align: center;
+      line-height: 1.6;
+      max-width: 480px;
+    }
     @media (max-width: 768px) {
       #header { height: 18vh; }
       #video-zone { height: 72vh; }
@@ -426,6 +493,7 @@
       .panel-inner { padding: 22px 18px; }
       .vid-card { width: calc(50% - 10px); min-width: 140px; }
       #video-status { font-size: 0.68rem; left: 10px; right: 10px; bottom: 10px; }
+      #cast-btn { right: 56px; }
     }
   </style>
 </head>
@@ -435,6 +503,16 @@
       <div id="logo-track">
         <img class="logo-item" id="logo-garcia" src="IMG_000.PNG" alt="García Diseños" />
       </div>
+
+      <div id="cast-btn" title="Enviar a TV" onclick="openPanel('tv')" aria-label="Enviar a TV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 16.5a5.5 5.5 0 0 1 5.5 5.5"></path>
+          <path d="M2 12a10 10 0 0 1 10 10"></path>
+          <path d="M2 7.5A14.5 14.5 0 0 1 16.5 22"></path>
+          <rect x="3" y="3" width="18" height="14" rx="2"></rect>
+        </svg>
+      </div>
+
       <div id="gear-btn" title="Configuración" onclick="openMenu()" aria-label="Abrir configuración">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"></circle>
@@ -444,7 +522,19 @@
     </div>
 
     <div id="video-zone">
-      <video id="main-video" src="Screen000.mp4" autoplay loop muted playsinline preload="auto"></video>
+      <video
+        id="main-video"
+        src="Screen000.mp4"
+        autoplay
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        preload="auto"
+        controls
+        x-webkit-airplay="allow"
+        controlslist="nodownload noplaybackrate"
+      ></video>
       <div id="video-status">Cargando videos...</div>
     </div>
 
@@ -512,6 +602,29 @@
     </div>
   </div>
 
+  <div id="panel-tv" class="panel">
+    <div class="panel-inner">
+      <h2>📺 &nbsp; Enviar a TV</h2>
+      <div class="tv-guide">
+        <div class="tv-guide-item">
+          <strong>Android / ChromeCast / Google TV</strong>
+          Abre esta misma página desde tu celular, toca el botón de controles del video o usa una app tipo Web Video Cast si tu TV detecta mejor el MP4 desde ahí.
+        </div>
+        <div class="tv-guide-item">
+          <strong>iPhone / iPad / AirPlay</strong>
+          Reproduce el video y usa AirPlay desde Safari si tu TV o Apple TV es compatible. Este reproductor ya quedó preparado para intentar reproducción remota.
+        </div>
+        <div class="tv-guide-item">
+          <strong>Video actual</strong>
+          El envío al TV debe usar el video que esté activo en pantalla. Si cambias de video en la galería, vuelve a intentar el envío desde el móvil.
+        </div>
+      </div>
+      <button class="tv-action-btn" onclick="activarControlesRemotos()">Activar modo enviar a TV</button>
+      <p class="tv-status" id="tv-status">Modo estándar activo. Si tu navegador o sistema detecta salida remota, usa los controles del reproductor o el menú del dispositivo.</p>
+      <button class="panel-close" onclick="closePanel('tv')">← Volver</button>
+    </div>
+  </div>
+
   <script>
     let VIDEO_SOURCES = [];
     let currentIndex = 0;
@@ -525,6 +638,8 @@
     const mainVideo = document.getElementById('main-video');
     const videoStatus = document.getElementById('video-status');
     const tickerTrack = document.getElementById('ticker-track');
+    const castBtn = document.getElementById('cast-btn');
+    const tvStatus = document.getElementById('tv-status');
 
     let logoRAF = null;
     let logoX = 0;
@@ -623,6 +738,7 @@
       mainVideo.load();
       mainVideo.play().catch(() => {});
       setVideoStatus(`Activo: ${video.name}`);
+      actualizarTVStatus(video.name);
 
       document.querySelectorAll('.vid-card').forEach(c => c.classList.remove('active-vid'));
 
@@ -671,6 +787,22 @@
         console.error('Error cargando videos.json:', error);
         setVideoStatus('Error al cargar videos.json');
       }
+    }
+
+    function activarControlesRemotos() {
+      castBtn.classList.add('active');
+      mainVideo.setAttribute('controls', 'controls');
+      mainVideo.setAttribute('x-webkit-airplay', 'allow');
+      mainVideo.setAttribute('playsinline', 'playsinline');
+      mainVideo.setAttribute('webkit-playsinline', 'webkit-playsinline');
+
+      const nombre = VIDEO_SOURCES[currentIndex]?.name || 'Video actual';
+      tvStatus.textContent = `Modo enviar a TV activado. Reproduce o pausa si tu celular lo pide y usa AirPlay, Cast del sistema o una app externa para mandar: ${nombre}.`;
+    }
+
+    function actualizarTVStatus(nombreVideo) {
+      if (!tvStatus) return;
+      tvStatus.textContent = `Video preparado para envío remoto: ${nombreVideo}. Si tu dispositivo lo soporta, usa AirPlay, Cast del sistema o app de navegador a TV.`;
     }
 
     mainVideo.addEventListener('pause', () => {
