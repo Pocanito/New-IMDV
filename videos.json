@@ -1,6 +1,10 @@
 {
   "videos": [
     { "name": "Video principal", "file": "Screen000.mp4", "principal": true },
+    { "name": "Promo 1", "file": "video001.mp4" },
+    { "name": "Promo 2", "file": "video002.mp4" },
+    { "name": "Promo 3", "file": "video003.mp4" },
+    { "name": "Promo 4", "file": "video004.mp4" },
     { "name": "Promo 5", "file": "video005.mp4" },
     { "name": "Promo 6", "file": "video006.mp4" },
     { "name": "Promo 7", "file": "video007.mp4" }
